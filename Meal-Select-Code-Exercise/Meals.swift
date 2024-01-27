@@ -7,7 +7,9 @@
 
 import Foundation
 import SwiftUI
-//
+
+
+
 //struct Meal: Hashable, Codable{
 //        let idMeal: Int
 //        let strMeal: String

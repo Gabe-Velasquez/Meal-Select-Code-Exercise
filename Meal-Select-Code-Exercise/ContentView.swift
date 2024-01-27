@@ -76,7 +76,7 @@ struct ContentView: View {
                 do {
                     let response = try JSONDecoder().decode(MealsResponse.self, from: data)
                     DispatchQueue.main.async {
-                        self.meals = response.meals
+                        self.meals = response.meals.sorted(by: {$0.strMeal < $1.strMeal})
                     }
                 } catch {
                     print("Error decoding JSON: \(error)")
