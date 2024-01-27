@@ -33,15 +33,39 @@ struct ContentView: View {
             Text("What sounds good to eat?")
                 .bold()
                 .padding(10)
-            Picker(selection: $selectedOption, label: Text("Select an option")) {
+            Picker(selection: $selectedOption, label: Text("Select a Category")) {
                             ForEach(0..<options.count) { index in
-                                Text(self.options[index]).tag(index)
+                                Text(self.options[index]).tag(index);
                             }
                         }
-                        .pickerStyle(MenuPickerStyle()) // Apply MenuPickerStyle to make it look like a dropdown menu
-
+            .pickerStyle(MenuPickerStyle())
+            Button(action: {
+                fetchMeals()
+            }) {
+                            Text("Submit")
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
                         Text("Selected Option: \(options[selectedOption])")
                             .padding()
+        }
+        
+        func fetchMeals() {
+            let selectedOption = options[selectedOption]; else {
+                return
+            }
+            let urlString = "https://themealdb.com/api/json/v1/1/filter.php?c=\(selectedOption)"
+            guard let url = URL(string: urlString) else {
+                return
+            }
+            URLSession.shared.dataTask(with: url){data, response, error in
+                guard let data = data,error == nil else{
+                    print("Error: \(error?.localizedDescription ?? "Unkown error")")
+                    return
+                }
+            }
         }
 //        NavigationView{
 //            List{
