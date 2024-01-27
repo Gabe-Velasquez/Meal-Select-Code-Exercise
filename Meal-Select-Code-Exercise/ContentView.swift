@@ -52,14 +52,25 @@ struct ContentView: View {
                 ScrollView{
                     VStack {
                         ForEach(meals) { (meal: Meal) in
-                            Text(meal.strMeal)
-                                .padding()
+                            VStack{
+                                if let url = URL(string: meal.strMealThumb),
+                                   let imageData = try? Data(contentsOf: url),
+                                   let uiImage = UIImage(data: imageData){
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 100, height:100)
+                                }
+                                Text(meal.strMeal)
+                                    .padding()
+                            }
                         }
                     }
                 }
             }
             .frame(width: 300)
         }
+    
 
         func fetchMeals() {
             let selectedOptionString = options[selectedOption].lowercased()
@@ -72,7 +83,6 @@ struct ContentView: View {
                     print("Error: \(error?.localizedDescription ?? "Unknown error")")
                     return
                 }
-                
                 do {
                     let response = try JSONDecoder().decode(MealsResponse.self, from: data)
                     DispatchQueue.main.async {
@@ -94,6 +104,7 @@ struct ContentView: View {
     struct Meal: Decodable, Identifiable {
         let idMeal: String
         let strMeal: String
+        let strMealThumb: String
         var id: String {idMeal}
     }
 
