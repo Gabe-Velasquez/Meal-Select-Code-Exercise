@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var selectedMeal: Meal? = nil
     @State private var isShowingModal = false
     @State private var mealInstructions: String = ""
+    @State private var mealIngredients: [String] = []
 
     var body: some View {
         VStack {
@@ -47,6 +48,7 @@ struct ContentView: View {
                 VStack {
                     ForEach(meals) { meal in
                         VStack{
+                            
                             if let url = URL(string: meal.strMealThumb),
                                let imageData = try? Data(contentsOf: url),
                                let uiImage = UIImage(data: imageData){
@@ -54,6 +56,11 @@ struct ContentView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 100, height:100)
+                                    .onTapGesture {
+                                        selectedMeal = meal
+                                        fetchInstructions(for: meal.idMeal)
+                                        isShowingModal.toggle()
+                                    }
                             }
                             Text(meal.strMeal)
                                 .onTapGesture {
@@ -66,10 +73,10 @@ struct ContentView: View {
                 }
             }
         }
-        .frame(width: 300)
+        .frame(width: 350)
         .sheet(isPresented: $isShowingModal) {
             if let selectedMeal = selectedMeal {
-                MealDetailView(meal: selectedMeal, instructions: mealInstructions)
+                MealDetailView(meal: selectedMeal, ingredients: mealIngredients, instructions: mealInstructions )
             }
         }
     }
@@ -111,6 +118,7 @@ struct ContentView: View {
                 if let meal = response.meals.first {
                     DispatchQueue.main.async {
                         self.mealInstructions = meal.strInstructions
+                        self.mealIngredients = meal.ingredients
                     }
                 }
             } catch {
@@ -143,10 +151,12 @@ struct MealInstructionsResponse: Decodable {
 
 struct MealInstructions: Decodable {
     let strInstructions: String
+    let ingredients:[String]
 }
 
 struct MealDetailView: View {
     let meal: Meal
+    let ingredients: [String]
     let instructions: String
 
     var body: some View {
@@ -157,6 +167,12 @@ struct MealDetailView: View {
 
             Text(meal.strMeal)
                 .font(.headline)
+            
+            Text("Ingredients:")
+            ForEach(0..<ingredients.count, id: \.self) { index in
+                Text(ingredients[index])
+                    .padding(.leading)
+            }
 
             Text("Instructions:")
             Text(instructions)
