@@ -47,19 +47,18 @@ struct ContentView: View {
                         .cornerRadius(8)
                 }
                 Text("Selected Option: \(options[selectedOption])")
-                    .padding()
-            }
-            
-            VStack {
-                // Display the fetched meals here
-                ForEach(meals) { (meal: Meal) in
-                    Text(meal.strMeal)
-                        .padding()
+                
+                Spacer()
+                ScrollView{
+                    VStack {
+                        ForEach(meals) { (meal: Meal) in
+                            Text(meal.strMeal)
+                                .padding()
+                        }
+                    }
                 }
             }
-            .padding()
-            
-            Spacer()
+            .frame(width: 300)
         }
 
         func fetchMeals() {
