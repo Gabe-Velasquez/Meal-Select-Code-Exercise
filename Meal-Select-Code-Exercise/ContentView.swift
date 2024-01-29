@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject var viewModel = ViewModel()
     @State private var selectedOption = 0
+    
     let options = [
         "Beef", 
         "Breakfast",
@@ -26,200 +28,152 @@ struct ContentView: View {
     ]
     @State private var meals: [Meal] = []
     @State private var selectedMeal: Meal? = nil
-    @State private var isShowingModal = false
-    @State private var mealInstructions: String = ""
-    @State private var ingredients: [String] = []
-    @State private var selectedMealDetail: MealDetail? = nil
+//    @State private var isShowingModal = false
+//    @State private var mealInstructions: String = ""
+//    @State private var ingredients: [String] = []
+//    @State private var selectedMealDetail: MealDetail? = nil
 
 
     var body: some View {
-            VStack {
-                Text("What sounds good to eat?")
-                    .bold()
-                    .padding(10)
-                Picker(selection: $selectedOption, label: Text("Select a Category")) {
-                    ForEach(0..<options.count, id: \.self) { index in
-                        Text(self.options[index])
-                    }
+        VStack {
+            Text("What sounds good to eat?")
+                .bold()
+                .padding(10)
+            Picker(selection: $selectedOption, label: Text("Select a Category")) {
+                ForEach(0..<options.count, id: \.self) { index in
+                    Text(self.options[index])
                 }
-                .pickerStyle(MenuPickerStyle())
-                Button(action: {
-                    fetchMeals()
-                }) {
-                    Text("Submit")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                Text("Selected Option: \(options[selectedOption])")
-
-                Spacer()
-                Divider()
-                ScrollView {
-                    VStack {
-                        ForEach(meals) { meal in
-                            VStack{
-                                if let url = URL(string: meal.strMealThumb),
-                                   let imageData = try? Data(contentsOf: url),
-                                   let uiImage = UIImage(data: imageData){
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(width: 100, height:100)
-                                        .onTapGesture {
-                                            selectedMeal = meal
-                                            fetchMealDetails(for: meal.idMeal)
-                                            isShowingModal = true
-                                        }
-                                }
-                                Text(meal.strMeal)
-                                    .onTapGesture {
-                                        selectedMeal = meal
-                                        fetchMealDetails(for: meal.idMeal)
-                                        isShowingModal = true
-                                    }
-                            }
+            }
+            .pickerStyle(MenuPickerStyle())
+            Button(action: {
+                viewModel.fetchMeals()
+            }) {
+                Text("Submit")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+            Text("Selected Option: \(options[selectedOption])")
+            
+            Spacer()
+            Divider()
+            ScrollView {
+                VStack {
+                    List(viewModel.meals) { meal in
+                        HStack {
+//                            URLImage(urlString: meal.strMealThumb)
+//                                .frame(width: 50, height: 50)
+//                                .cornerRadius(8)
+//                                .onTapGesture {
+//                                    isShowingModal = true
+//                                }
+                            Text(meal.strMeal)
+//                                .onTapGesture {
+//                                    isShowingModal = true
+//                                }
+                            Spacer()
                         }
                     }
                 }
-            }
-            .frame(width: 300)
-            .sheet(isPresented: $isShowingModal) {
-                if let selectedMealDetail = selectedMealDetail {
-                    MealDetailView(mealDetail: selectedMealDetail)
-                }
+                .frame(width: 300)
+//                .sheet(isPresented: $isShowingModal) {
+//                    if let selectedMealDetail = selectedMealDetail {
+//                        MealDetailView(mealDetail: selectedMealDetail)
+//                    }
+//                }
             }
         }
-
-        func fetchMeals() {
-            let selectedOptionString = options[selectedOption].lowercased()
-            let urlString = "https://www.themealdb.com/api/json/v1/1/filter.php?c=\(selectedOptionString)"
-            guard let url = URL(string: urlString) else {
-                return
-            }
-            URLSession.shared.dataTask(with: url) { data, response, error in
-                guard let data = data, error == nil else {
-                    print("Error: \(error?.localizedDescription ?? "Unknown error")")
-                    return
-                }
-                do {
-                    let response = try JSONDecoder().decode(MealsResponse.self, from: data)
-                    DispatchQueue.main.async {
-                        self.meals = response.meals.sorted(by: {$0.strMeal < $1.strMeal})
-                    }
-                } catch {
-                    print("Error decoding JSON: \(error)")
-                }
-            }.resume()
-        }
-
-    func fetchMealDetails(for mealID: String) {
-        let urlString = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(mealID)"
-        guard let url = URL(string: urlString) else {
-            return
-        }
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Error: \(error?.localizedDescription ?? "Unknown error")")
-                return
-            }
-            do {
-                let response = try JSONDecoder().decode(MealDetail.self, from: data)
-                DispatchQueue.main.async {
-                    // Present MealDetailView with the fetched meal detail
-                    isShowingModal = true
-                    self.selectedMealDetail = response
-                }
-            } catch {
-                print("Error decoding JSON: \(error)")
-            }
-        }.resume()
     }
 }
 
-struct Meal: Decodable, Identifiable {
+//func fetchMealDetails(for mealID: String, isShowingModal: Binding<Bool>) {
+//    let urlString = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(mealID)"
+//    guard let url = URL(string: urlString) else {
+//        return
+//    }
+//
+//    URLSession.shared.dataTask(with: url) { [weak self] data, response, error in // Capture self weakly
+//        guard let self = self else { return } // Unwrap weak self
+//
+//        guard let data = data, error == nil else {
+//            print("Error: \(error?.localizedDescription ?? "Unknown error")")
+//            return
+//        }
+//
+//        do {
+//            let response = try JSONDecoder().decode(MealDetail.self, from: data)
+//            DispatchQueue.main.async { // Update UI on main thread
+//                isShowingModal.wrappedValue = true
+//                self.selectedMealDetail = response // Access self's properties
+//            }
+//        } catch {
+//            print("Error decoding JSON: \(error)")
+//        }
+//    }.resume()
+//}
+
+struct MealDetail: Hashable, Codable, Equatable {
     let idMeal: String
     let strMeal: String
     let strMealThumb: String
-    var id: String { idMeal }
-}
-
-struct MealsResponse: Decodable {
-    let meals: [Meal]
-}
-
-struct MealInstructionsResponse: Decodable {
-    let meals: [MealDetail]
-}
-
-struct MealInstructions: Decodable {
     let strInstructions: String
-}
-
-struct MealDetail: Decodable {
-    let idMeal: String
-    let strMeal: String
-    let strMealThumb: String
-    let strInstructions: String
-    let strIngredient1: String?
-    let strIngredient2: String?
-    let strIngredient3: String?
-    let strIngredient4: String?
-    let strIngredient5: String?
-    let strIngredient6: String?
-    let strIngredient7: String?
-    let strIngredient8: String?
-    let strIngredient9: String?
-    let strIngredient10: String?
-    let strIngredient12: String?
-    let strIngredient13: String?
-    let strIngredient14: String?
-    let strIngredient15: String?
-    let strIngredient16: String?
-    let strIngredient17: String?
-    let strIngredient18: String?
-    let strIngredient19: String?
-    let strIngredient20: String?
-    let strMeasure1: String?
-    let strMeasure2: String?
-    let strMeasure3: String?
-    let strMeasure4: String?
-    let strMeasure5: String?
-    let strMeasure6: String?
-    let strMeasure7: String?
-    let strMeasure8: String?
-    let strMeasure9: String?
-    let strMeasure10: String?
-    let strMeasure11: String?
-    let strMeasure12: String?
-    let strMeasure13: String?
-    let strMeasure14: String?
-    let strMeasure15: String?
-    let strMeasure16: String?
-    let strMeasure17: String?
-    let strMeasure18: String?
-    let strMeasure19: String?
-    let strMeasure20: String?
-
-        var ingredients: [(String, String)] {
+    let ingredients: [(String, String)]
+    
+    private enum CodingKeys: String, CodingKey {
+        case idMeal
+        case strMeal
+        case strMealThumb
+        case strInstructions
+        // Add coding keys if you have more properties
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.idMeal = try container.decode(String.self, forKey: .idMeal)
+        self.strMeal = try container.decode(String.self, forKey: .strMeal)
+        self.strMealThumb = try container.decode(String.self, forKey: .strMealThumb)
+        self.strInstructions = try container.decode(String.self, forKey: .strInstructions)
+        
+        // Initialize ingredients property with the constructed array
+        self.ingredients = {
             var ingredientsArray: [(String, String)] = []
-
-            // Add ingredients and their measures to the array
-            if let ingredient1 = strIngredient1, let measure1 = strMeasure1, !ingredient1.isEmpty {
-                ingredientsArray.append((ingredient1, measure1))
+            
+            for index in 1...20 {
+                let ingredientKey = "strIngredient\(index)"
+                let measureKey = "strMeasure\(index)"
+                
+                if let ingredientCodingKey = CodingKeys(rawValue: ingredientKey),
+                   let measureCodingKey = CodingKeys(rawValue: measureKey) {
+                    if let ingredient = try? container.decode(String.self, forKey: ingredientCodingKey),
+                       let measure = try? container.decode(String.self, forKey: measureCodingKey) {
+                        ingredientsArray.append((ingredient, measure))
+                    }
+                }
             }
-            if let ingredient2 = strIngredient2, let measure2 = strMeasure2, !ingredient2.isEmpty {
-                ingredientsArray.append((ingredient2, measure2))
-            }
-            if let ingredient3 = strIngredient3, let measure3 = strMeasure3, !ingredient3.isEmpty {
-                ingredientsArray.append((ingredient3, measure3))
-            }
-            // Repeat for all ingredients and measures
-
             return ingredientsArray
+        }()
+    }
+    static func == (lhs: MealDetail, rhs: MealDetail) -> Bool {
+            return lhs.idMeal == rhs.idMeal &&
+                   lhs.strMeal == rhs.strMeal &&
+                   lhs.strMealThumb == rhs.strMealThumb &&
+                   lhs.strInstructions == rhs.strInstructions &&
+                    lhs.ingredients.elementsEqual(rhs.ingredients, by: ==)
+        }
+    func hash(into hasher: inout Hasher) {
+            hasher.combine(idMeal)
+            hasher.combine(strMeal)
+            hasher.combine(strMealThumb)
+            hasher.combine(strInstructions)
+            for (ingredient, measure) in ingredients {
+                hasher.combine(ingredient)
+                hasher.combine(measure)
+            }
         }
 }
+
+
 
 struct MealDetailView: View {
     let mealDetail: MealDetail
