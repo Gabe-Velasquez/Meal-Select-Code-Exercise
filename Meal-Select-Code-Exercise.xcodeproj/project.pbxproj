@@ -16,6 +16,7 @@
 		E46B64E42B64639A00F9943D /* Meal_Select_Code_ExerciseUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46B64E32B64639A00F9943D /* Meal_Select_Code_ExerciseUITestsLaunchTests.swift */; };
 		E46B64F12B64730500F9943D /* Meals.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46B64F02B64730500F9943D /* Meals.swift */; };
 		E46B64F32B64A93800F9943D /* Remoteimage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46B64F22B64A93800F9943D /* Remoteimage.swift */; };
+		E48E8AA22B69FB89006E3F6F /* DetailedMeal.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48E8AA12B69FB89006E3F6F /* DetailedMeal.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		E46B64E32B64639A00F9943D /* Meal_Select_Code_ExerciseUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meal_Select_Code_ExerciseUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		E46B64F02B64730500F9943D /* Meals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meals.swift; sourceTree = "<group>"; };
 		E46B64F22B64A93800F9943D /* Remoteimage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Remoteimage.swift; sourceTree = "<group>"; };
+		E48E8AA12B69FB89006E3F6F /* DetailedMeal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedMeal.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 			children = (
 				E46B64C62B64639700F9943D /* Meal_Select_Code_ExerciseApp.swift */,
 				E46B64C82B64639700F9943D /* ContentView.swift */,
+				E48E8AA12B69FB89006E3F6F /* DetailedMeal.swift */,
 				E46B64CA2B64639900F9943D /* Assets.xcassets */,
 				E46B64CC2B64639900F9943D /* Preview Content */,
 				E46B64F02B64730500F9943D /* Meals.swift */,
@@ -263,6 +266,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E48E8AA22B69FB89006E3F6F /* DetailedMeal.swift in Sources */,
 				E46B64F12B64730500F9943D /* Meals.swift in Sources */,
 				E46B64C92B64639700F9943D /* ContentView.swift in Sources */,
 				E46B64C72B64639700F9943D /* Meal_Select_Code_ExerciseApp.swift in Sources */,

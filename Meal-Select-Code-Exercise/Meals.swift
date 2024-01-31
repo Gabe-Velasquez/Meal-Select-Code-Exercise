@@ -52,13 +52,21 @@ class ViewModel: ObservableObject{
                 print("Received JSON data: \(jsonString)")
             }
             do {
-                let response = try JSONDecoder().decode(MealsResponse.self, from: data)
-                DispatchQueue.main.async {
-                    self?.meals = response.meals.sorted(by: { $0.strMeal < $1.strMeal })
-                }
-            } catch {
-                print("Error decoding JSON: \(error)")
-            }
+                                let meals=try JSONDecoder().decode([Meal].self,
+                                    from:data)
+                                DispatchQueue.main.async{
+                                    self?.meals = meals
+                                }
+                            }catch{
+                                print(error)
+                            }
+//                let response = try JSONDecoder().decode(MealsResponse.self, from: data)
+//                DispatchQueue.main.async {
+//                    self?.meals = response.meals.sorted(by: { $0.strMeal < $1.strMeal })
+//                }
+//            } catch {
+//                print("Error decoding JSON: \(error)")
+//            }
         }
         task.resume()
     }
