@@ -30,6 +30,7 @@ struct ContentView: View {
     @State private var mealInstructions: String = ""
     @State private var ingredients: [String] = []
     @State private var selectedMealDetail: MealDetail? = nil
+    
 
 
     var body: some View {
@@ -44,7 +45,9 @@ struct ContentView: View {
                 }
                 .pickerStyle(MenuPickerStyle())
                 Button(action: {
-                    fetchMeals()
+                    mealFetch.fetchMeals(selectedOption: selectedOption, options: options) { fetchedMeals in
+                        self.meals = fetchedMeals
+                    }
                 }) {
                     Text("Submit")
                         .padding()
@@ -92,28 +95,6 @@ struct ContentView: View {
             }
         }
 
-        func fetchMeals() {
-            let selectedOptionString = options[selectedOption].lowercased()
-            let urlString = "https://www.themealdb.com/api/json/v1/1/filter.php?c=\(selectedOptionString)"
-            guard let url = URL(string: urlString) else {
-                return
-            }
-            URLSession.shared.dataTask(with: url) { data, response, error in
-                guard let data = data, error == nil else {
-                    print("Error: \(error?.localizedDescription ?? "Unknown error")")
-                    return
-                }
-                do {
-                    let response = try JSONDecoder().decode(MealsResponse.self, from: data)
-                    DispatchQueue.main.async {
-                        self.meals = response.meals.sorted(by: {$0.strMeal < $1.strMeal})
-                    }
-                } catch {
-                    print("Error decoding JSON: \(error)")
-                }
-            }.resume()
-        }
-
     func fetchMealDetails(for mealID: String) {
         let urlString = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(mealID)"
         guard let url = URL(string: urlString) else {
@@ -158,7 +139,7 @@ struct MealInstructions: Decodable {
 }
 
 struct MealDetail: Decodable {
-    let idMeal: String
+    let id: String
     let strMeal: String
     let strMealThumb: String
     let strInstructions: String
@@ -172,6 +153,7 @@ struct MealDetail: Decodable {
     let strIngredient8: String?
     let strIngredient9: String?
     let strIngredient10: String?
+    let strIngredient11: String?
     let strIngredient12: String?
     let strIngredient13: String?
     let strIngredient14: String?
@@ -219,6 +201,79 @@ struct MealDetail: Decodable {
 
             return ingredientsArray
         }
+//    enum CodingKeys: String, CodingKey{
+//        case idMeal
+//        case strMeal
+//        case strMealThumb
+//        case strInstructions
+//        case strIngredient1
+//        case strIngredient2
+//        case strIngredient3
+//        case strIngredient4
+//        case strIngredient5
+//        case strIngredient6
+//        case strIngredient7
+//        case strIngredient8
+//        case strIngredient9
+//        case strIngredient10
+//        case strIngredient11
+//        case strIngredient12
+//        case strIngredient13
+//        case strIngredient14
+//        case strIngredient15
+//        case strIngredient16
+//        case strIngredient17
+//        case strIngredient18
+//        case strIngredient19
+//        case strIngredient20
+//        case strMeasure1
+//        case strMeasure2
+//        case strMeasure3
+//        case strMeasure4
+//        case strMeasure5
+//        case strMeasure6
+//        case strMeasure7
+//        case strMeasure8
+//        case strMeasure9
+//        case strMeasure10
+//        case strMeasure11
+//        case strMeasure12
+//        case strMeasure13
+//        case strMeasure14
+//        case strMeasure15
+//        case strMeasure16
+//        case strMeasure17
+//        case strMeasure18
+//        case strMeasure19
+//        case strMeasure20
+//    }
+//    init(from decoder: Decoder) throws {
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        id = try container.decode(String.self, forKey: .idMeal)
+//        strMeal = try container.decode(String.self, forKey: .strMeal)
+//        strMealThumb = try container.decode(String.self, forKey: .strMealThumb)
+//        strInstructions = try container.decode(String.self, forKey: .strInstructions)
+//        strIngredient1 = try container.decodeIfPresent(String.self, forKey: .strIngredient1)
+//        strIngredient2 = try container.decodeIfPresent(String.self, forKey: .strIngredient2)
+//        strIngredient3 = try container.decodeIfPresent(String.self, forKey: .strIngredient3)
+//        strIngredient4 = try container.decodeIfPresent(String.self, forKey: .strIngredient4)
+//        strIngredient5 = try container.decodeIfPresent(String.self, forKey: .strIngredient5)
+//        strIngredient6 = try container.decodeIfPresent(String.self, forKey: .strIngredient6)
+//        strIngredient7 = try container.decodeIfPresent(String.self, forKey: .strIngredient7)
+//        strIngredient8 = try container.decodeIfPresent(String.self, forKey: .strIngredient8)
+//        strIngredient9 = try container.decodeIfPresent(String.self, forKey: .strIngredient9)
+//        strIngredient10 = try container.decodeIfPresent(String.self, forKey: .strIngredient10)
+//        strIngredient11 = try container.decodeIfPresent(String.self, forKey: .strIngredient11)
+//        strIngredient12 = try container.decodeIfPresent(String.self, forKey: .strIngredient12)
+//        strIngredient13 = try container.decodeIfPresent(String.self, forKey: .strIngredient13)
+//        strIngredient14 = try container.decodeIfPresent(String.self, forKey: .strIngredient14)
+//        strIngredient15 = try container.decodeIfPresent(String.self, forKey: .strIngredient15)
+//        strIngredient16 = try container.decodeIfPresent(String.self, forKey: .strIngredient16)
+//        strIngredient17 = try container.decodeIfPresent(String.self, forKey: .strIngredient17)
+//        strIngredient18 = try container.decodeIfPresent(String.self, forKey: .strIngredient18)
+//        strIngredient19 = try container.decodeIfPresent(String.self, forKey: .strIngredient19)
+//        strIngredient20 = try container.decodeIfPresent(String.self, forKey: .strIngredient20)
+//    }
 }
 
 struct MealDetailView: View {
